@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
 from taco_llmingway import GPT
 from taco_llmingway.tokenizer import Tokenizer
 import torch
@@ -31,4 +32,20 @@ async def generate(query: GenerateQuery):
         tokens, n_iters=query.n_iters, temperature=query.temperature
     )
 
-    return {"generated_text": tokenizer.decode(new_tokens[0].numpy().tolist())}
+    return {"generated_text": tokenizer.decode(new_tokens.squeeze().tolist())}
+
+
+@app.post("/stream")
+async def stream(query: GenerateQuery):
+    tokens = torch.tensor(
+        tokenizer.encode(query.starting_text), dtype=torch.long
+    ).unsqueeze(0)
+
+    stream_gen = model.stream(
+        tokens,
+        n_iters=query.n_iters,
+        tokenizer=tokenizer,
+        temperature=query.temperature,
+    )
+
+    return StreamingResponse(stream_gen, media_type="text/plain")
