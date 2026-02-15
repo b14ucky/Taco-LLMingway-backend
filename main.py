@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from taco_llmingway import GPT
 from taco_llmingway.tokenizer import Tokenizer
 import torch
@@ -7,6 +8,14 @@ from pathlib import Path
 from pydantic import BaseModel
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 tokenizer_path = Path("model/tokenizer.json")
 config_path = Path("model/config.json")
