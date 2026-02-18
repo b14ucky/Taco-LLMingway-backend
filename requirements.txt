@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+gunicorn
+pydantic
+# Note: install torch-cpu manually on VPS to avoid CUDA bloat
+torch
